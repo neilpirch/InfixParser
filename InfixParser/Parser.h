@@ -31,15 +31,20 @@ private:
 	bool isOperator(char op) const {
 		return OPERATORS.find(op) != string::npos;
 	}
+	bool isDouble(char op) const {
+		return DOUBLES.find(op) != string::npos;
+	}
 	int precedence(char op) const {
 		return PRECEDENCE[OPERATORS.find(op)];
 	}
 	
 	// these variables won't matter anymore
 	static const string OPERATORS;
+	//for checking if an operator could be double
+	static const string DOUBLES;
 	static const int PRECEDENCE[];
 	stack<int> operandStack;
-	stack<token> operatorStack;
+	stack<char> operatorStack;
 };
 
 #endif

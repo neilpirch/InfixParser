@@ -5,6 +5,7 @@
 
 
 const string Parser::OPERATORS = "><+-*/%^!()[]{}";
+const string Parser::DOUBLES = "<>=&|+-!";
 const int Parser::PRECEDENCE[] = { 4, 4, 5, 5, 6, 6, 6, 7, 8, -1, -1, -1, -1, -1, -1 };
 Parser::Parser()
 {
@@ -14,17 +15,47 @@ void Parser::Parse(string infixExpr)
 {
 	char next_token;
 	cout << infixExpr << " = ";
-
+	char tmp = 'F';
 	istringstream infix_tokens(infixExpr);
-
 	while (infix_tokens >> next_token)
 	{
+		if (tmp != 'F') {
+			bool doubled = true;
+			if (tmp == '+' && next_token == '+')
+				ParseOperator('I');
+			else if (tmp == '-' && next_token == '-')
+				ParseOperator('D');
+			else if (tmp == '>' && next_token == '=')
+				ParseOperator('G');
+			else if (tmp == '<' && next_token == '=')
+				ParseOperator('L');
+			else if (tmp == '=' && next_token == '=')
+				ParseOperator('E');
+			else if (tmp == '!' && next_token == '=')
+				ParseOperator('N');
+			else if (tmp == '&' && next_token == '&') 
+				ParseOperator('A');
+			else if (tmp == '|' && next_token == '|')
+				ParseOperator('O');
+			else
+			{
+				doubled = false;
+				ParseOperator(tmp);
+			}
+			tmp = 'F'; //Clear tmpval
+			if (doubled)
+				continue;
+		}
 		if (isdigit(next_token))
 		{
 			infix_tokens.putback(next_token);
 			int value;
 			infix_tokens >> value;
 			operandStack.push(value);
+		}
+		else if (isDouble(next_token))
+		{
+			tmp = next_token;
 		}
 		else if (isOperator(next_token))
 		{
@@ -142,6 +173,15 @@ void Parser::Calculate()
 		operandStack.push(result);
 		break;
 	case('*'): 	result = leftOperand * rightOperand;
+		operandStack.push(result);
+		break;
+	case('E'): result = leftOperand == rightOperand;
+		operandStack.push(result);
+		break;
+	case('G'): result = leftOperand >= rightOperand;
+		operandStack.push(result);
+		break;
+	case('A'): result = leftOperand && rightOperand;
 		operandStack.push(result);
 		break;
 	case('/'): 	
