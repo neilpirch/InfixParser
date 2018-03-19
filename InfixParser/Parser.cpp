@@ -77,12 +77,31 @@ void Parser::Parse(string infixExpr)
 
 void Parser::ParseOperator(char op)
 {
+	string a = "Expression can't start with a closing parenthesis, >, or < @ char: 0";
+
 	if (operatorStack.empty() || (op == '(') || (op == '[') || (op == '{'))
 	{
-		if (op == ')' || op == ']' || op == '}') {
-			throw Syntax_Error("Expression can't start with a closing parenthesis @ char: 0");
-		}	else if (op == '<' || op == '>') { 
-			throw Syntax_Error("Expression can't start with a binary operator @ char: 0"); 
+		if(op == ')' || op == ']' || op == '}' || op == '<' || op == '>')
+		try {
+			if (op == ')' || op == ']' || op == '}')
+			{
+				throw op;
+			}
+		}
+		catch(char op)
+		{
+			cout << a << endl;
+		}
+
+		try {
+			if (op == '<' || op == '>')
+			{
+				throw op;
+			}
+		}
+		catch (char op) 
+		{
+			cout << a << endl;
 		}
 		operatorStack.push(op);
 	}
@@ -207,8 +226,12 @@ void Parser::Calculate()
 
 void Parser::Display()
 {
+	if (operandStack.empty()) {
+		return;
+	}
 	int result = operandStack.top();
 	operandStack.pop();
 	cout << result << endl;
 	return;
 }
+
