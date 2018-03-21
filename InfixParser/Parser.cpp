@@ -33,7 +33,7 @@ void Parser::Parse(string infixExpr)
 				ParseOperator('E');
 			else if (tmp == '!' && next_token == '=')
 				ParseOperator('N');
-			else if (tmp == '&' && next_token == '&') 
+			else if (tmp == '&' && next_token == '&')
 				ParseOperator('A');
 			else if (tmp == '|' && next_token == '|')
 				ParseOperator('O');
@@ -69,7 +69,7 @@ void Parser::Parse(string infixExpr)
 	{
 		Calculate();
 	}
-	
+
 	Display();
 
 	return;
@@ -77,63 +77,82 @@ void Parser::Parse(string infixExpr)
 
 void Parser::ParseOperator(char op)
 {
+	string a = "Expression can't start with a closing parenthesis, >, or < @ char: 0";
+
 	if (operatorStack.empty() || (op == '(') || (op == '[') || (op == '{'))
 	{
-		if (op == ')' || op == ']' || op == '}') {
-			throw Syntax_Error("Expression can't start with a closing parenthesis @ char: 0");
-		}	else if (op == '<' || op == '>') { 
-			throw Syntax_Error("Expression can't start with a binary operator @ char: 0"); 
+		if(op == ')' || op == ']' || op == '}' || op == '<' || op == '>')
+		try {
+			if (op == ')' || op == ']' || op == '}')
+			{
+				throw op;
+			}
+		}
+		catch(char op)
+		{
+			cout << a << endl;
+		}
+
+		try {
+			if (op == '<' || op == '>')
+			{
+				throw op;
+			}
+		}
+		catch (char op) 
+		{
+			cout << a << endl;
 		}
 		operatorStack.push(op);
 	}
-		else
-		{
-			if (precedence(op) > precedence(operatorStack.top())) {
-				operatorStack.push(op);
-			}
-			else {
-				// Pop all stacked operators with equal
-				// or higher precedence than op.
-				while (!operatorStack.empty()
-					&& (operatorStack.top() != '(')
-					&& (operatorStack.top() != '[')
-					&& (operatorStack.top() != '{')
-					&& (precedence(op) <= precedence(operatorStack.top())))
-				{
-					Calculate();
+	else
+	{
+		if (precedence(op) > precedence(operatorStack.top())) {
+			operatorStack.push(op);
+		}
+		else {
+			// Pop all stacked operators with equal
+			// or higher precedence than op.
+			while (!operatorStack.empty()
+				&& (operatorStack.top() != '(')
+				&& (operatorStack.top() != '[')
+				&& (operatorStack.top() != '{')
+				&& (precedence(op) <= precedence(operatorStack.top())))
+			{
+				Calculate();
 
+			}
+			// assert: Operator stack is empty or 
+			//         top of stack is '(' or current
+			//         operator precedence > top of stack operator
+			//         precedence;
+			if (op == ')') {
+				if (!operatorStack.empty() && (operatorStack.top() == '(')) {
+					operatorStack.pop();
 				}
-				// assert: Operator stack is empty or 
-				//         top of stack is '(' or current
-				//         operator precedence > top of stack operator
-				//         precedence;
-				if (op == ')') {
-					if (!operatorStack.empty() && (operatorStack.top() == '(')) {
-						operatorStack.pop();
-					}
-					else {throw Syntax_Error("Unmatched close parentheses");}
+				else { throw Syntax_Error("Unmatched close parentheses"); }
+			}
+			else if (op == ']') {
+				if (!operatorStack.empty()
+					&& (operatorStack.top() == '[')) {
+					operatorStack.pop();
 				}
-				else if (op == ']') {
-					if (!operatorStack.empty()
-						&& (operatorStack.top() == '[')) {
-						operatorStack.pop();
-					}
-					else {throw Syntax_Error("Unmatched close parentheses");}
-				}
-				else if (op == '}') {
-					if (!operatorStack.empty()
-						&& (operatorStack.top() == '{')) {
-						operatorStack.pop();
-					}
-					else {
-						throw Syntax_Error("Unmatched close parentheses");
-					}
+				else { throw Syntax_Error("Unmatched close parentheses"); }
+			}
+			else if (op == '}') {
+				if (!operatorStack.empty()
+					&& (operatorStack.top() == '{')) {
+					operatorStack.pop();
 				}
 				else {
-					operatorStack.push(op);
+					throw Syntax_Error("Unmatched close parentheses");
 				}
 			}
+			else {
+				operatorStack.push(op);
+			}
 		}
+	}
 	return;
 }
 
@@ -144,7 +163,7 @@ void Parser::Calculate()
 
 	op = operatorStack.top();
 	operatorStack.pop();
-	
+
 
 	rightOperand = operandStack.top();
 	operandStack.pop();
@@ -155,11 +174,13 @@ void Parser::Calculate()
 		operandStack.push(result);
 		return;
 	}
-
+	if (operandStack.empty()) {
+		return;
+	}
 	leftOperand = operandStack.top();
 	operandStack.pop();
-	
-	
+
+
 
 	switch (op)			//cases: ^, *, /, +, - Add error checking
 	{
@@ -184,12 +205,12 @@ void Parser::Calculate()
 	case('A'): result = leftOperand && rightOperand;
 		operandStack.push(result);
 		break;
-	case('/'): 	
+	case('/'):
 		if (rightOperand == 0)
 		{
 			cout << "Division by zero";
 		}
-		
+
 		else {
 			result = leftOperand / rightOperand;
 			operandStack.push(result);
@@ -207,6 +228,9 @@ void Parser::Calculate()
 
 void Parser::Display()
 {
+	if (operandStack.empty()) {
+		return;
+	}
 	int result = operandStack.top();
 	operandStack.pop();
 	cout << result << endl;
