@@ -14,6 +14,7 @@ Parser::Parser()
 void Parser::Parse(string infixExpr)
 {
 	char next_token;
+	char next_token1;
 	cout << infixExpr << " = ";
 	char tmp = 'F';
 	istringstream infix_tokens(infixExpr);
@@ -65,6 +66,7 @@ void Parser::Parse(string infixExpr)
 			throw Syntax_Error("Invalid Character Encountered");
 		}
 	}
+
 	while (!operatorStack.empty())
 	{
 		Calculate();
@@ -78,17 +80,19 @@ void Parser::Parse(string infixExpr)
 void Parser::ParseOperator(char op)
 {
 	string a = "Expression can't start with a closing parenthesis, >, or < @ char: 0";
+	
+	//This try catch section will catch the errors of statements starting with ), ], }, <, >
 
 	if (operatorStack.empty() || (op == '(') || (op == '[') || (op == '{'))
 	{
-		if(op == ')' || op == ']' || op == '}' || op == '<' || op == '>')
-		try {
+		if (op == ')' || op == ']' || op == '}' || op == '<' || op == '>')
+			try {
 			if (op == ')' || op == ']' || op == '}')
 			{
 				throw op;
 			}
 		}
-		catch(char op)
+		catch (char op)
 		{
 			cout << a << endl;
 		}
@@ -99,7 +103,7 @@ void Parser::ParseOperator(char op)
 				throw op;
 			}
 		}
-		catch (char op) 
+		catch (char op)
 		{
 			cout << a << endl;
 		}
@@ -177,6 +181,7 @@ void Parser::Calculate()
 	if (operandStack.empty()) {
 		return;
 	}
+
 	leftOperand = operandStack.top();
 	operandStack.pop();
 
@@ -228,11 +233,21 @@ void Parser::Calculate()
 
 void Parser::Display()
 {
+	//Displays the function 1/0
 	if (operandStack.empty()) {
 		return;
 	}
-	int result = operandStack.top();
-	operandStack.pop();
-	cout << result << endl;
-	return;
+	//Displays the function 15+3 2
+	else if (operandStack.size() > 1) {
+		cout << "Cannot have two operands in a row" << endl;
+		while (!operandStack.empty()) {
+			operandStack.pop();
+		}
+	}
+	else {
+		int result = operandStack.top();
+		operandStack.pop();
+		cout << result << endl;
+	}
+		return;
 }
