@@ -4,9 +4,9 @@
 #include <math.h>
 
 
-const string Parser::OPERATORS = "><+-*/%^!()[]{}";
+const string Parser::OPERATORS = "OAENGL><+-*/%^!()[]{}DI";
 const string Parser::DOUBLES = "<>=&|+-!";
-const int Parser::PRECEDENCE[] = { 4, 4, 5, 5, 6, 6, 6, 7, 8, -1, -1, -1, -1, -1, -1 };
+const int Parser::PRECEDENCE[] = { 1, 2, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6, 7, 8, -1, -1, -1, -1, -1, -1, 8, 8 };
 Parser::Parser()
 {
 }
@@ -17,9 +17,19 @@ void Parser::Parse(string infixExpr)
 	char next_token1;
 	cout << infixExpr << " = ";
 	char tmp = 'F';
+
+
+	// 	Tokenize string and process next token
+
 	istringstream infix_tokens(infixExpr);
 	while (infix_tokens >> next_token)
 	{
+		
+		/*
+		This section checks for two-character operators
+		These are replaced through character substitution
+		*/
+
 		if (tmp != 'F') {
 			bool doubled = true;
 			if (tmp == '+' && next_token == '+')
@@ -47,6 +57,11 @@ void Parser::Parse(string infixExpr)
 			if (doubled)
 				continue;
 		}
+		
+		/*
+		Parse and process operands and operators
+		*/
+		
 		if (isdigit(next_token))
 		{
 			infix_tokens.putback(next_token);
@@ -67,6 +82,11 @@ void Parser::Parse(string infixExpr)
 		}
 	}
 
+	/*
+	Once the entire string is sorted to stacks, 
+	calculate until stack is empty and output the result
+	*/
+
 	while (!operatorStack.empty())
 	{
 		Calculate();
@@ -79,6 +99,7 @@ void Parser::Parse(string infixExpr)
 
 void Parser::ParseOperator(char op)
 {
+	
 	string a = "Expression can't start with a closing parenthesis, >, or < @ char: 0";
 	
 	//This try catch section will catch the errors of statements starting with ), ], }, <, >
@@ -162,6 +183,7 @@ void Parser::ParseOperator(char op)
 
 void Parser::Calculate()
 {
+	
 	int 	rightOperand, leftOperand, result;
 	char op;
 
@@ -175,6 +197,12 @@ void Parser::Calculate()
 	switch (op)
 	{
 	case('!'): 	result = !rightOperand;
+		operandStack.push(result);
+		return;
+	case('I'): result = ++rightOperand;
+		operandStack.push(result);
+		return;
+	case('D'): result = --rightOperand;
 		operandStack.push(result);
 		return;
 	}
@@ -213,7 +241,7 @@ void Parser::Calculate()
 	case('/'):
 		if (rightOperand == 0)
 		{
-			cout << "Division by zero";
+			cout << "Division by zero" << endl;
 		}
 
 		else {

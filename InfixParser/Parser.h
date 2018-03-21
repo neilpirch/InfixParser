@@ -13,13 +13,6 @@ using namespace std;
 class Parser
 {
 public:
-	struct token {
-		string	symbol;
-		string	tokenType;  //enum, op, eof
-		int		intValue;
-		int		precedence;
-		bool	isUnary;	// inc, dec, neg, not -> true
-	};
 	Parser();
 	void Parse(string);
 	void ParseOperator(char);
@@ -27,7 +20,6 @@ public:
 	void Display();
 
 private:
-	// these functions will move to be inside the parser
 	bool isOperator(char op) const {
 		return OPERATORS.find(op) != string::npos;
 	}
@@ -38,7 +30,6 @@ private:
 		return PRECEDENCE[OPERATORS.find(op)];
 	}
 	
-	// these variables won't matter anymore
 	static const string OPERATORS;
 	//for checking if an operator could be double
 	static const string DOUBLES;

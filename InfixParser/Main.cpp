@@ -17,11 +17,10 @@ int main()
 	infix.Parse("1+3>2");
 	infix.Parse("(4>=4) && 0");
 	infix.Parse("(1+2)*3");
-	//infix.Parse("++++2-5*(3^2)");
+	infix.Parse("++2-5*(3^2)");
 	
 	infix.Parse(")3+2");
 	infix.Parse("<3+2");
-	//infix.Parse("3&&&&5");
 	infix.Parse("15+3 2");
 	infix.Parse("1/0");
 
